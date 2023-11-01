@@ -84,9 +84,52 @@ export default class Slide {
         this.onEnd = this.onEnd.bind(this);
     }
 
+    slidePosition(slide) {
+        // this.wrapper.offsetWidth vai pegar a largura total do this.wrapper, porém só o que aparece dele na tela, ou seja
+        // seria o mesmo que pegar a largura da tela praticamente, pelo o que entendi, depois - slide.offsetWidth que é a largura de cada imagem 
+        // dividido por 2, no caso eu quero fazer isso para poder colocar a imagem no centro
+        const margin = (this.wrapper.offsetWidth - slide.offsetWidth) / 2;
+        return -(slide.offsetLeft - margin); // no caso o valor antes da imagem - a margin ou seja vai andar somente o distancia
+        // que foi para a margin, e esse valor precisa ser negativo por isso coloquei -(), só o primeiro valor vai ser positivo pelo que entendi
+    }
+
+    slidesConfig() {
+        // FIXME: aqui [...this.slide.children] estou pegando os filhos do slide e desestruturando ele, no caso era um HTMLCollection,
+        // mas ao desestruturar vira uma array, entao posso usar o .map
+        this.slideArray = [...this.slide.children].map((element) => {
+            // element.offsetLeft; // se me lembro offsetLeft é a distancia da esquerda a até a esquerda do meu elemento
+            const position = this.slidePosition(element);
+            // pelo o que entendi retornar para o this.slideArray
+            return { position, element }
+        }); 
+        console.log(this.slideArray)
+    }
+
+    slidesIndexNav(index) {
+        const last = this.slideArray.length - 1; // para pegar o ultimo item da array
+        console.log(last);
+        this.index = {
+            prev: index ? index -1 : undefined, // FIXME: se o index for 0, entao vai entrar em false, e vou receber undefined pq n existe numero anterior
+            active: index, // slide atual
+            next: index === last ? undefined : index + 1, // se o slide atual for igual o ultimo, entao vai dar undefined pq n existe
+            // mais proximo, se nao vai somar com mais um pq é o proximo slide 
+        }
+    }
+
+    changeSlide(index) {
+        const activeSlide = this.slideArray[index]
+        this.moveSlide(activeSlide.position); // FIXME: no caso o this.slideArray ali no slidesConfig recebe
+        // um novo array, eu estou acessando esse novo array, no caso ao colocar o index eu escolho qual array, e pego a position
+        // de la, e vai para o this.moveSlide
+        this.slidesIndexNav(index);
+        console.log(this.index)
+        this.dist.finalPosition = activeSlide.position; // preciso atualizar a distancia
+    }
+
     init() {
         this.bindEvents();
         this.addSlideEvents();
+        this.slidesConfig();
         return this;
     }
 }
