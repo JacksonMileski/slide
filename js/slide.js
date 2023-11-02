@@ -10,6 +10,13 @@ export default class Slide {
         }
         
     }
+
+    transition(active) {
+        // o transition no style.css ficou muito ruim pq ele está adicionando o transition toda vez que
+        // eu mexo um um pixel do meu slide, entao fiz aqui
+        this.slide.style.transition = active ? 'transform .3s' : '';
+    }
+
     // TODO: creio que mousemove é só uma forma de falar que to no pc, e mousemove é q estou no celular no caso vou colocar
     // em addEventListener
     moveSlide(distX) {
@@ -51,6 +58,10 @@ export default class Slide {
         // eu estiver mexendo o mouse FIXME: mas eu fiz o seguinte, esse evento só vai disparar quando eu clicar no this.wrapper, ai sim
         // vai disparar esse evento, e ali no 'onEnd' vai tirar o evento de mousemove ao desclicar // essa logica vai servir para dispositivos
         //de touch tbm
+        this.transition(false); // FIXME: quando começar o meu evento eu removo ele, no caso quando eu estiver com o mouse mexendo
+        // ai quando eu largo o mouse ele ativa o evento transition
+        // FIXME: no caso a animação no começo precisa estar em true, depois false para mover com o mouse, depois true ao largar
+        // para funcionar a animação
     }
 
     onMove(event) {
@@ -68,8 +79,26 @@ export default class Slide {
         this.wrapper.removeEventListener(movetype, this.onMove); // FIXME: tira o evento de mousemove ao desclicar, ou do evento do celular
         this.dist.finalPosition = this.dist.movePosition; // FIXME: para ter uma referencia da onde está o meu mouse, para tomar vez q eu clicar nao 
         // começar meu slide do inicio // vai receber o valor quando desclico com o mouse
+        this.transition(true); // FIXME: quando eu terminar o meu movimento entao ai sim da true no transition
+        // FIXME: o transition precisa ser antes do changeSlideOnEnd se nao só estaria fazendo a mudança quando o slide já
+        // tinha ocorrido
+        this.changeSlideOnEnd();
     }
 
+    changeSlideOnEnd() {
+        // FIXME: quando eu coloco pra frente o movement é positivo, se coloco pra trás ele é negativo, entao
+        // n quero esperar o usuario colocar certinho onde quer a imagem, e sim ao arrastar um pouco e soltar a imagem
+        // já vá para o local, entao fiz essa verificação
+        if(this.dist.movement > 120 && this.index.next !== undefined) {
+            this.activeNextSlide();
+        } else if(this.dist.movement < -120 && this.index.prev !== undefined) {
+            this.activePrevSlide();
+        } else { // problema de quando chegar na no primeiro slide, ele n vai ter mais slide antes, entao vai dar erro
+            // entao se n for o if nem o else if entao 
+            this.changeSlide(this.index.active); // se n for nenhuma das opçoes vai pro meu slide atual
+        }
+        console.log(this.dist.movement)
+    }
     addSlideEvents() {
         // para o this, n ser uma referencia a 'this.wrapper' e sim ao meu class Slide preciso fazer a bind
         this.wrapper.addEventListener('mousedown', this.onStart); // mousedown é quando eu clico
@@ -105,7 +134,8 @@ export default class Slide {
         console.log(this.slideArray)
     }
 
-    slidesIndexNav(index) {
+    slidesIndexNav(index) { // aqui pelo o que entendi vai ser para o usuario q estiver no script.js usar no slide.changeSlide(); algum numero
+        // para poder ir para tal slide por exemplo slide.changeSlide(3);
         const last = this.slideArray.length - 1; // para pegar o ultimo item da array
         console.log(last);
         this.index = {
@@ -126,8 +156,17 @@ export default class Slide {
         this.dist.finalPosition = activeSlide.position; // preciso atualizar a distancia
     }
 
+    activePrevSlide() {
+        if(this.index.prev !== undefined) this.changeSlide(this.index.prev);
+    }
+
+    activeNextSlide() {
+        if(this.index.next !== undefined) this.changeSlide(this.index.next);
+    }
+
     init() {
         this.bindEvents();
+        this.transition(true); // FIXME: ao iniciar o transition precisa estar em true pq se nao nao funciona parece
         this.addSlideEvents();
         this.slidesConfig();
         return this;
