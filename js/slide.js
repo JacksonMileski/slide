@@ -1,3 +1,5 @@
+import debounce from "./debounce";
+
 export default class Slide {
     constructor(slide, wrapper) {
         this.slide = document.querySelector(slide);
@@ -8,7 +10,7 @@ export default class Slide {
             startX: 0, // referencia da onde meu mouse estava(acho q é isso)
             movement: 0 // total q se moveu
         }
-        
+        this.activeClass = 'active';
     }
 
     transition(active) {
@@ -107,12 +109,6 @@ export default class Slide {
         this.wrapper.addEventListener('touchend', this.onEnd); // quando o usuario tira o dedo do mobile o evento é disparado
     }
 
-    bindEvents() { // vou colocar aqui todos binds q eu precisar
-        this.onStart = this.onStart.bind(this);
-        this.onMove = this.onMove.bind(this);
-        this.onEnd = this.onEnd.bind(this);
-    }
-
     slidePosition(slide) {
         // this.wrapper.offsetWidth vai pegar a largura total do this.wrapper, porém só o que aparece dele na tela, ou seja
         // seria o mesmo que pegar a largura da tela praticamente, pelo o que entendi, depois - slide.offsetWidth que é a largura de cada imagem 
@@ -154,6 +150,13 @@ export default class Slide {
         this.slidesIndexNav(index);
         console.log(this.index)
         this.dist.finalPosition = activeSlide.position; // preciso atualizar a distancia
+        this.changeActiveClass();
+    }
+
+    changeActiveClass() {
+        this.slideArray.forEach(item => item.element.classList.remove(this.activeClass)); // remove os ativos, para deixar somente um ativo
+        // pq se nao ia add ativo e nao ia remover os anteriores
+        this.slideArray[this.index.active].element.classList.add(this.activeClass); // add ativo ao passar de slid
     }
 
     activePrevSlide() {
@@ -164,11 +167,36 @@ export default class Slide {
         if(this.index.next !== undefined) this.changeSlide(this.index.next);
     }
 
+    onResize() {
+        // FIXME: estava dando problema ainda, estava meio zoado o posicionamento, entao fiz o setTimeout para
+        // esperar 1seg e depois atualizar as informações
+        setTimeout(() => {
+        // toda vez que eu dou resize na tela zua tudo, pq as posições que eu dei na minha array mudam todas, entao preciso
+        // reatualizar as configurações quando dar o resize
+        this.slidesConfig();
+        this.changeSlide(this.index.active);
+        }, 1000);  
+    }
+
+    addResizeEvent() {
+        window.addEventListener('resize', this.onResize);
+    }
+
+    bindEvents() { // vou colocar aqui todos binds q eu precisar
+        this.onStart = this.onStart.bind(this);
+        this.onMove = this.onMove.bind(this);
+        this.onEnd = this.onEnd.bind(this);
+        // FIXME: enquanto eu estiver movimentando o resize da tela vai ativando diversos eventos de resize, entao vou usar
+        // o debounce, o cara do curso falou q sempre uso o debounce no bind geralmente
+        this.onResize = debounce(this.onResize.bind(this), 200);
+    }
+
     init() {
         this.bindEvents();
         this.transition(true); // FIXME: ao iniciar o transition precisa estar em true pq se nao nao funciona parece
         this.addSlideEvents();
         this.slidesConfig();
+        this.addResizeEvent();
         return this;
     }
 }
