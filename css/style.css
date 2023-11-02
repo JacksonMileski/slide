@@ -23,9 +23,35 @@ img {
     display: flex;
 }
 
+.slide:hover { /*FIXME: estou informando ao browser que quando eu passar o mouse hover em cima o transform vai mudar,
+    no caso quando eu clicar em cima pelo o que entendi, isso da uma performace melhor*/
+    will-change: transform;
+}
+
 .slide li {
     flex-shrink: 0; /* antes eles se seguravam para n estourar o container, agora com o shrink 0 eles podem estourar */
     width: 80vw; /* cada li vai ter 80% da tela */
     max-width: 800px; /* pd pegar 80% da tela, mas no máximo 800px */
     margin: 0 20px;
+
+    border-radius: 4px;
+    overflow: hidden; /* No caso de uma imagem, se você definir overflow: hidden, qualquer parte da imagem que esteja fora dos
+    limites do elemento que a contém não será visível. Em outras palavras, a imagem será cortada para se ajustar ao tamanho do 
+    contêiner, e qualquer parte que ultrapasse esse contêiner ficará invisível.*/
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+    opacity: .8;
+    transform: scale(.8);
+    transition: .4s; /* transition na li n tem problema, pelo o que entendi eu fiz o transition na 'div' 'slide-wrapper' por
+    isso tive fazer via js, agora como estou na li em si que é a imagem, entao posso fazer  a transition. FIXME: ou nao é isso
+    e sim no js eu fiz o transition para cada slide mudar de lugar pq se eu fizesse por aqui iria fazer o transition toda vez
+    que eu mexo um pixel do meu slide, e eu queria somente dar o slide quando o mouse soltasse(fiz td isso no js) mas estou me 
+    referindo ao transition no '.slide', mas agora como é na li eu posso fazer
+    o transition que vai me dar uma escala diferente e opacidade durante o tempo de '.4s', no caso n tem problema fazer na li que é
+    o item em sí(eu acho)*/
+}
+
+.slide li.active {
+    opacity: 1;
+    transform: scale(1); /* FIXME: o scale é o tamanho do elemento, nesse caso é a imagem
+    ele aumenta ou diminui a imagem mantendo a proporção, e '1' é o padrao*/
 }
