@@ -1,6 +1,6 @@
-import debounce from "./debounce";
+import debounce from "./debounce.js";
 
-export default class Slide {
+export class Slide {
     constructor(slide, wrapper) {
         this.slide = document.querySelector(slide);
         this.wrapper = document.querySelector(wrapper);
@@ -186,9 +186,14 @@ export default class Slide {
         this.onStart = this.onStart.bind(this);
         this.onMove = this.onMove.bind(this);
         this.onEnd = this.onEnd.bind(this);
+
+        this.activePrevSlide = this.activePrevSlide.bind(this);
+        this.activeNextSlide = this.activeNextSlide.bind(this);
+
         // FIXME: enquanto eu estiver movimentando o resize da tela vai ativando diversos eventos de resize, entao vou usar
         // o debounce, o cara do curso falou q sempre uso o debounce no bind geralmente
         this.onResize = debounce(this.onResize.bind(this), 200);
+        
     }
 
     init() {
@@ -197,6 +202,24 @@ export default class Slide {
         this.addSlideEvents();
         this.slidesConfig();
         this.addResizeEvent();
+        this.changeSlide(0); // FIXME: precisa ativar um slide de inicio, pode ser qualquer um
         return this;
+    }
+}
+
+// creio q ele extendeu para separar dos meus slides, no caso ficar
+// mais organizado
+
+// posso exportar os dois, mas só posso ter um 'default'
+export class SlideNav extends Slide { // se eu estender a classe eu n preciso criar outro construtor se ele for igual
+    addArrow(prev, next) {
+        this.prevElement = document.querySelector(prev);
+        this.nextElement = document.querySelector(next);
+        this.addArrowEvent();
+    }
+    
+    addArrowEvent() {
+        this.prevElement.addEventListener('click', this.activePrevSlide);
+        this.nextElement.addEventListener('click', this.activeNextSlide);
     }
 }
