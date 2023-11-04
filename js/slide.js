@@ -217,7 +217,7 @@ export class Slide {
 // mais organizado
 
 // posso exportar os dois, mas só posso ter um 'default'
-export class SlideNav extends Slide { // se eu estender a classe eu n preciso criar outro construtor se ele for igual
+export default class SlideNav extends Slide { // se eu estender a classe eu n preciso criar outro construtor se ele for igual
     constructor(slide, wrapper) {
  // FIXME: quando eu uso o construtor de uma classe estendida, eu preciso usar o super, para pegar todos argumentos da classe anterior
         super(slide, wrapper); // FIXME: se eu nao fosse colocar mais coisa no construtor, entao n precisaria ter esse construtor

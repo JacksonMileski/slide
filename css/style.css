@@ -77,3 +77,50 @@ img {
 [data-control="slide"] li.active a, [data-control="slide"] li a:hover { 
     background-color: #E54;
 }
+
+.custom-controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    flex-wrap: wrap; /* caso estoure o container entao quebre */
+    margin-bottom: 20px;
+}
+
+.custom-controls li {
+    opacity: .8;
+    transform: scale(.8); /* 80% do valor dele */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden; /* FIXME: como dei um border-radius de 50% na li, vai continuar aparecendo a imagem em quadrado, entao
+    usei o overflow: hidden; entao o que for fora da li no caso desse circulo nao vai aparecer*/
+    margin: 2px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, .5);
+    transition: .3s; /* FIXME: só pra bolinhas demorar esse tempo para dar o efeito nela*/
+}
+
+.custom-controls li.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.arrow-nav {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.arrow-nav button {
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    color: white;
+    background: #FB5 url('../img/arrow.svg') center center no-repeat; /* TODO: dentro do button vai ter essa imagem ela vai ser centralizada
+    tanto na horizontal quanto na vertical no centro e nao vai se repetir*/
+}
+
+.arrow-nav button.prev {
+    transform: rotate(-180deg); /* FIXME: como as flechas estava para o mesmo lado apontando entao girei -180deg a seta do 'prev'*/
+}
