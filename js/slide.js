@@ -156,6 +156,7 @@ export class Slide {
         // FIXME: toda vez que mudar o slide, vai disparar o evento que eu criei
         this.wrapper.dispatchEvent(this.changeEvent); // FIXME: eu poderia colocar em qualquer elemento meu, entao coloquei no this.wrapper
         // ele vai emitir esse evento meu, e o evento q ele vai emitir é o meu evento que eu criei que é o this.changeEvent
+        // FIXME: no caso toda vez que mudar o slide, vai ativar o meu evento, o this.wrapper vai emitar esse meu evento que é o this.changeEvent
     }
 
     changeActiveClass() {
@@ -253,8 +254,12 @@ export class SlideNav extends Slide { // se eu estender a classe eu n preciso cr
             event.preventDefault();
             this.changeSlide(index); // vai trocar para o slide correspondente do circulo              
         });
+        // FIXME: https://pt.stackoverflow.com/questions/331560/como-criar-e-usar-eventos-personalizados#:~:text=Basicamente%2C%20para%20se%20criar%20um,por%20objetos%20como%20o%20Element%20.
         // toda vez que eu mudar um slide esse evento vai ser ativado, q foi o que eu criei
         // pelo o que eu entendi o evento n serve pra nada, só para muadr para o meu this.activeControlItem
+        // FIXME: melhor explicação: aqui eu vou ficar observando esse evento, e escutar pelo changeEvent, entao quando eu usar o this.wrapper.dispatchEvent(this.changeEvent);
+        // no changeSlide, lá vai ativar esse meu evento, acho que é isso, no caso o changeSlide ele muda meu slide, entao só quando mudar meu slide que 
+        // meu evento é disparado
         this.wrapper.addEventListener('changeEvent', this.activeControlItem); 
     }
 
@@ -278,3 +283,34 @@ export class SlideNav extends Slide { // se eu estender a classe eu n preciso cr
         this.activeControlItem = this.activeControlItem.bind(this);
     }
 }
+
+/*
+TODO: criar proprio evento
+// Para criar o evento:
+const myClickEvent = new Event('myClick');
+
+const myDiv = document.querySelector('#my-div');
+
+// Para ouvir o evento:
+myDiv.addEventListener('myClick', function () {
+  console.log('Evento customizado disparado!');
+});
+
+myDiv.addEventListener('click', function () {
+  // Disparar o evento:
+  myDiv.dispatchEvent(myClickEvent);
+});
+tirei de https://pt.stackoverflow.com/questions/331560/como-criar-e-usar-eventos-personalizados#:~:text=Basicamente%2C%20para%20se%20criar%20um,por%20objetos%20como%20o%20Element%20.
+
+pelo o que eu entendi é o seguinte
+
+no caso eu criei meu proprio evento chamado 'myClickEvent', na parte myDiv.addEventListener('myClick', function () {
+  console.log('Evento customizado disparado!');
+}); nessa parte eu estou ouvindo o meu evento. O meu evento só funcionaria quando eu fizesse o evento de clique que assim eu estaria dizendo 
+para o evento ativar, já que o  myDiv.dispatchEvent(myClickEvent); só é executado ao fazer o evento de clique pq está dentro de 
+myDiv.addEventListener('click', function () {
+  // Disparar o evento:
+  myDiv.dispatchEvent(myClickEvent);
+});
+
+*/
