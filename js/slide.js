@@ -11,6 +11,8 @@ export class Slide {
             movement: 0 // total q se moveu
         }
         this.activeClass = 'active';
+        // FIXME: nos podemos criar nosso proprio evento
+        this.changeEvent = new Event('changeEvent');
     }
 
     transition(active) {
@@ -151,6 +153,9 @@ export class Slide {
         console.log(this.index)
         this.dist.finalPosition = activeSlide.position; // preciso atualizar a distancia
         this.changeActiveClass();
+        // FIXME: toda vez que mudar o slide, vai disparar o evento que eu criei
+        this.wrapper.dispatchEvent(this.changeEvent); // FIXME: eu poderia colocar em qualquer elemento meu, entao coloquei no this.wrapper
+        // ele vai emitir esse evento meu, e o evento q ele vai emitir é o meu evento que eu criei que é o this.changeEvent
     }
 
     changeActiveClass() {
@@ -212,6 +217,13 @@ export class Slide {
 
 // posso exportar os dois, mas só posso ter um 'default'
 export class SlideNav extends Slide { // se eu estender a classe eu n preciso criar outro construtor se ele for igual
+    constructor(slide, wrapper) {
+ // FIXME: quando eu uso o construtor de uma classe estendida, eu preciso usar o super, para pegar todos argumentos da classe anterior
+        super(slide, wrapper); // FIXME: se eu nao fosse colocar mais coisa no construtor, entao n precisaria ter esse construtor
+        // pq usaria já da classe que estendeu // FIXME: no construtor poderia ser constructor(...args)
+        this.bindControlEvents(); // quando iniciar essa função, já faz o bind
+    }
+
     addArrow(prev, next) {
         this.prevElement = document.querySelector(prev);
         this.nextElement = document.querySelector(next);
@@ -221,5 +233,48 @@ export class SlideNav extends Slide { // se eu estender a classe eu n preciso cr
     addArrowEvent() {
         this.prevElement.addEventListener('click', this.activePrevSlide);
         this.nextElement.addEventListener('click', this.activeNextSlide);
+    }
+
+    createControl() {
+        const control = document.createElement('ul');
+        control.dataset.control = 'slide'; // dessa forma eu crio um data, vai ficar data-control = 'slide';
+
+        this.slideArray.forEach((item, index) => {
+            // coloquei mais 1 só para a pessao que ver n ver slide 0 e sim slide 1, pq para ela seria estranho
+            control.innerHTML += `<li><a href="#slide${index + 1}">${index + 1}</a></li>`
+        })
+        this.wrapper.appendChild(control);
+        console.log(control);
+        return control;
+    }
+
+    eventControl(item, index) {
+        item.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.changeSlide(index); // vai trocar para o slide correspondente do circulo              
+        });
+        // toda vez que eu mudar um slide esse evento vai ser ativado, q foi o que eu criei
+        // pelo o que eu entendi o evento n serve pra nada, só para muadr para o meu this.activeControlItem
+        this.wrapper.addEventListener('changeEvent', this.activeControlItem); 
+    }
+
+    activeControlItem() { 
+        this.controlArray.forEach(item => item.classList.remove(this.activeClass)); // remover os ativos q tiver
+        // coloca a class ativo nas imagens
+        this.controlArray[this.index.active].classList.add(this.activeClass);
+    }
+
+    addControl(customControl) { // se caso a pessoa quiser mandar o control dela
+        this.control = document.querySelector(customControl) || this.createControl();
+        this.controlArray = [...this.control.children]; // estou desestruturando minha HTMLCollection, agora vira uma array
+        // quando os argumentos do forEach forem iguais da função igual aqui 
+        this.activeControlItem(); // FIXME: para ser ativado a primeira vez sozinho, no caso o primeiro circulo
+        // this.controlArray.forEach((item, index) => this.eventControl(item, index)); entao posso passar igual esta a baixo
+        this.controlArray.forEach(this.eventControl);
+    }
+
+    bindControlEvents() {
+        this.eventControl = this.eventControl.bind(this);
+        this.activeControlItem = this.activeControlItem.bind(this);
     }
 }

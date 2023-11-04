@@ -55,3 +55,25 @@ img {
     transform: scale(1); /* FIXME: o scale é o tamanho do elemento, nesse caso é a imagem
     ele aumenta ou diminui a imagem mantendo a proporção, e '1' é o padrao*/
 }
+
+[data-control="slide"] {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+[data-control="slide"] li a { /* coloquei 'a' para ficar com a maozinha*/
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: #FB5;
+    border-radius: 50%;
+    text-indent: -99px; /* FIXME: estou colocando o texto mais para a esquerda*/
+    overflow: hidden; /* esconde os numeros já que n estao dentro dos circulos, explicação melhor em outra vez
+    que usei o overflow hidden*/
+    margin: 5px;
+}
+
+[data-control="slide"] li.active a, [data-control="slide"] li a:hover { 
+    background-color: #E54;
+}
